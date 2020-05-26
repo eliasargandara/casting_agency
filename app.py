@@ -6,7 +6,7 @@ from flask_cors import CORS
 from util import get_database_url
 from models.database import db, migrate
 from models.casting import Actor, Movie, actor_movie_relation
-from routes.health import health_blueprint
+from routes import health_blueprint, casting_blueprint
 from errors import errors_blueprint
 
 def create_app(database_url):
@@ -18,6 +18,7 @@ def create_app(database_url):
     CORS(app)
 
     app.register_blueprint(health_blueprint)
+    app.register_blueprint(casting_blueprint)
     app.register_blueprint(errors_blueprint)
     return app
 
