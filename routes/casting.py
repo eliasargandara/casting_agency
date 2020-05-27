@@ -1,11 +1,12 @@
-from flask import Blueprint, request, jsonify
-from werkzeug.exceptions import BadRequest, NotFound
+from flask import Blueprint, jsonify
+from werkzeug.exceptions import NotFound
 from marshmallow import ValidationError
 from sqlalchemy.orm import load_only
 
 from models.casting import Actor, Movie
 from schema import ActorSchema, MovieSchema
 from auth import requires_auth
+from util import load_data
 
 
 casting_blueprint = Blueprint('casting', __name__)
@@ -29,18 +30,8 @@ def retrieve_actors(token):
 @casting_blueprint.route('/actors', methods=['POST'])
 @requires_auth('post:actors')
 def create_actor(token):
-    if not request.data:
-        raise BadRequest(
-            description='The request did not contain a request body.'
-        )
-
-    if not request.is_json:
-        raise BadRequest(
-            description='The request expected a JSON request body.'
-        )
-
     schema = ActorSchema()
-    data = schema.load(request.get_json())
+    data = load_data(schema)
 
     movie_ids = data['movie_ids']
     movies = Movie.query.\
@@ -55,29 +46,19 @@ def create_actor(token):
         movies=movies
     )
     actor.insert()
-    serialized = schema.dump(actor)
+    serialized = [schema.dump(actor)]
 
     return jsonify({
         'success': True,
-        'data': [serialized]
+        'data': serialized
     })
 
 
 @casting_blueprint.route('/actors/<actor_id>', methods=['PATCH'])
 @requires_auth('patch:actors')
 def update_actor(actor_id, token):
-    if not request.data:
-        raise BadRequest(
-            description='The request did not contain a request body.'
-        )
-
-    if not request.is_json:
-        raise BadRequest(
-            description='The request expected a JSON request body.'
-        )
-
     schema = ActorSchema()
-    data = schema.load(request.get_json(), partial=True)
+    data = load_data(schema, partial=True)
 
     actor = Actor.query.\
         filter(Actor.id == actor_id).\

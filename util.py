@@ -1,5 +1,7 @@
 import os
 from dotenv import load_dotenv
+from flask import request
+from werkzeug.exceptions import BadRequest
 
 
 load_dotenv()
@@ -38,3 +40,22 @@ def get_database_url(db_name=None):
 
     db_url = create_database_url(**db_config)
     return db_url
+
+
+def load_data(schema, partial=False):
+    if not request.data:
+        raise BadRequest(
+            description='The request did not contain a request body.'
+        )
+
+    if not request.is_json:
+        raise BadRequest(
+            description='The request expected a JSON request body.'
+        )
+
+    data = schema.load(
+        request.get_json(),
+        partial=partial
+    )
+
+    return data
