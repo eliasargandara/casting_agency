@@ -111,3 +111,19 @@ def delete_actor(actor_id, token):
         'success': True,
         'id': actor.id
     })
+
+
+@casting_blueprint.route('/movies')
+@requires_auth('get:movies')
+def retrieve_movies(token):
+    movies = Movie.query.all()
+    schema = MovieSchema()
+    serialized = [
+        schema.dump(movie)
+        for movie in movies
+    ]
+
+    return jsonify({
+        'success': True,
+        'data': serialized
+    })
