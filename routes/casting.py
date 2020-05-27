@@ -110,3 +110,23 @@ def update_actor(actor_id, token):
         'success': True,
         'data': serialized
     })
+
+
+@casting_blueprint.route('/actors/<actor_id>', methods=['DELETE'])
+@requires_auth('delete:actors')
+def delete_actor(actor_id, token):
+    actor = Actor.query.\
+        filter(Actor.id == actor_id).\
+        one_or_none()
+
+    if not actor:
+        raise NotFound(
+            description=f'An actor with the id "{actor_id}" was not found.'
+        )
+
+    actor.delete()
+
+    return jsonify({
+        'success': True,
+        'id': actor.id
+    })
