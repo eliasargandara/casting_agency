@@ -11,6 +11,7 @@ from errors import errors_blueprint
 
 def create_app(database_url):
     app = Flask(__name__)
+    app.config['JSON_SORT_KEYS'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
