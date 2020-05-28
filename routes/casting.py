@@ -127,3 +127,30 @@ def retrieve_movies(token):
         'success': True,
         'data': serialized
     })
+
+
+@casting_blueprint.route('/movies', methods=['POST'])
+@requires_auth('post:movies')
+def create_movie(token):
+    schema = MovieSchema()
+    data = load_data(schema, partial=True)
+
+    actor_ids = data['actor_ids']
+    actors = Actor.query.\
+        filter(Actor.id.in_(actor_ids)).\
+        options(load_only('id')).\
+        all()
+
+    release_date = data['release_date'].replace(tzinfo=None)
+    movie = Movie(
+        title=data['title'],
+        release_date=release_date,
+        actors=actors
+    )
+    movie.insert()
+    serialized = [schema.dump(movie)]
+
+    return jsonify({
+        'success': True,
+        'data': serialized
+    })

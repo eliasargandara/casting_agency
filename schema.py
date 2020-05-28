@@ -99,7 +99,8 @@ class MovieSchema(Schema):
         fields.Nested(
             lambda: ActorSchema(exclude=['movies'])
         ),
-        missing=[]
+        missing=[],
+        dump_only=True
     )
 
     actor_ids = fields.List(
