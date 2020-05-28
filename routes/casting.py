@@ -191,3 +191,23 @@ def update_movie(movie_id, token):
         'success': True,
         'data': serialized
     })
+
+
+@casting_blueprint.route('/movies/<movie_id>', methods=['DELETE'])
+@requires_auth('delete:movies')
+def delete_movie(movie_id, token):
+    movie = Movie.query.\
+        filter(Movie.id == movie_id).\
+        one_or_none()
+
+    if not movie:
+        raise NotFound(
+            description=f'A movie with the id "{movie_id}" was not found.'
+        )
+
+    movie.delete()
+
+    return jsonify({
+        'success': True,
+        'id': movie_id
+    })
