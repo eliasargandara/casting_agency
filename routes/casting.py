@@ -154,3 +154,40 @@ def create_movie(token):
         'success': True,
         'data': serialized
     })
+
+
+@casting_blueprint.route('/movies/<movie_id>', methods=['PATCH'])
+@requires_auth('patch:movies')
+def update_movie(movie_id, token):
+    schema = MovieSchema()
+    data = load_data(schema, partial=True)
+
+    movie = Movie.query.\
+        filter(Movie.id == movie_id).\
+        one_or_none()
+
+    if not movie:
+        raise NotFound(
+            description=f'A movie with the id "{movie_id}" was not found.'
+        )
+
+    if 'title' in data:
+        movie.title = data['title']
+    if 'release_date' in data:
+        movie.release_date = data['release_date'].replace(tzinfo=None)
+    if 'actor_ids' in data:
+        actor_ids = data['actor_ids']
+        actors = Actor.query.\
+            filter(Actor.id.in_(actor_ids)).\
+            options(load_only('id')).\
+            all()
+
+        movie.actors = actors
+
+    movie.update()
+    serialized = [schema.dump(movie)]
+
+    return jsonify({
+        'success': True,
+        'data': serialized
+    })
