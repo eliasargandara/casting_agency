@@ -60,40 +60,49 @@ def find_rsa_key(unverified_header, jwks):
     return rsa_key
 
 
-def decode_token(token):
+def retrieve_rsa_key(unverified_header):
     jwks = get_jwks()
-    unverified_header = jwt.get_unverified_header(token)
     rsa_key = find_rsa_key(unverified_header, jwks)
 
-    if rsa_key:
-        try:
-            payload = jwt.decode(
-                token,
-                rsa_key,
-                algorithms=ALGORITHMS,
-                audience=API_AUDIENCE,
-                issuer=f'https://{AUTH0_DOMAIN}/'
+    if not rsa_key:
+        raise BadRequest(
+            description=(
+                'Unable to find the appropriate authentication key.'
             )
-            return payload
+        )
 
-        except jwt.ExpiredSignatureError:
-            raise Unauthorized(
-                description='Token expired.'
-            )
-        except jwt.JWTClaimsError:
-            raise Unauthorized(
-                description=(
-                    'Incorrect claims. Please check the audience and issuer.'
-                )
-            )
-        except Exception:
-            raise BadRequest(
-                description='Unable to parse authentication token.'
-            )
+    return rsa_key
 
-    raise BadRequest(
-        description='Unable to find the appropriate authentication key.'
-    )
+
+def decode_token(token):
+    try:
+        unverified_header = jwt.get_unverified_header(token)
+        rsa_key = retrieve_rsa_key(unverified_header)
+        payload = jwt.decode(
+            token,
+            rsa_key,
+            algorithms=ALGORITHMS,
+            audience=API_AUDIENCE,
+            issuer=f'https://{AUTH0_DOMAIN}/'
+        )
+        return payload
+
+    except jwt.ExpiredSignatureError:
+        raise Unauthorized(
+            description='Token expired.'
+        )
+    except jwt.JWTClaimsError:
+        raise Unauthorized(
+            description=(
+                'Incorrect claims. Please check the audience and issuer.'
+            )
+        )
+    except (jwt.JWTError, jwt.JWSError):
+        raise BadRequest(
+            description='Unable to parse authentication token.'
+        )
+    except Exception as exception:
+        raise
 
 
 def check_permissions(permission, payload):

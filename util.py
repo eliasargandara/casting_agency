@@ -1,7 +1,10 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 from flask import request
 from werkzeug.exceptions import BadRequest
+from datetime import datetime
+from models.database import db
 
 
 load_dotenv()
@@ -59,3 +62,52 @@ def load_data(schema, partial=False):
     )
 
     return data
+
+
+def load_test_env():
+    env_path = str(Path('.env-test').absolute())
+    load_dotenv(env_path)
+
+
+def set_auth_token(client, token):
+    client.environ_base['HTTP_AUTHORIZATION'] = f'Bearer {token}'
+
+
+mock_data = {
+    'actor_a': {
+        'name': 'Tom Hanks',
+        'age': 64,
+        'gender': 'male'
+    },
+    'movie_a': {
+        'title': 'Forrest Gump',
+        'release_date': datetime.fromisoformat('1994-07-06T00:00:00')
+    },
+    'actor_b': {
+        'name': 'Al Pacino',
+        'age': 80,
+        'gender': 'male'
+    },
+    'actors_b': [
+        {
+            'name': 'Robert Duvall',
+            'age': 89,
+            'gender': 'male'
+        },
+        {
+            'name': 'Diane Keaton',
+            'age': 74,
+            'gender': 'female'
+        }
+    ],
+    'movies_b': [
+        {
+            'title': 'The Godfather',
+            'release_date': datetime.fromisoformat('1972-03-24T00:00:00')
+        },
+        {
+            'title': 'The Godfather: Part II',
+            'release_date': datetime.fromisoformat('1974-12-18T00:00:00')
+        }
+    ]
+}
