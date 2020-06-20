@@ -54,7 +54,7 @@ def create_actor(token):
     })
 
 
-@casting_blueprint.route('/actors/<actor_id>', methods=['PATCH'])
+@casting_blueprint.route('/actors/<int:actor_id>', methods=['PATCH'])
 @requires_auth('patch:actors')
 def update_actor(actor_id, token):
     schema = ActorSchema()
@@ -93,7 +93,7 @@ def update_actor(actor_id, token):
     })
 
 
-@casting_blueprint.route('/actors/<actor_id>', methods=['DELETE'])
+@casting_blueprint.route('/actors/<int:actor_id>', methods=['DELETE'])
 @requires_auth('delete:actors')
 def delete_actor(actor_id, token):
     actor = Actor.query.\
@@ -156,7 +156,7 @@ def create_movie(token):
     })
 
 
-@casting_blueprint.route('/movies/<movie_id>', methods=['PATCH'])
+@casting_blueprint.route('/movies/<int:movie_id>', methods=['PATCH'])
 @requires_auth('patch:movies')
 def update_movie(movie_id, token):
     schema = MovieSchema()
@@ -193,7 +193,7 @@ def update_movie(movie_id, token):
     })
 
 
-@casting_blueprint.route('/movies/<movie_id>', methods=['DELETE'])
+@casting_blueprint.route('/movies/<int:movie_id>', methods=['DELETE'])
 @requires_auth('delete:movies')
 def delete_movie(movie_id, token):
     movie = Movie.query.\
