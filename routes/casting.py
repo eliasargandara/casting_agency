@@ -133,7 +133,7 @@ def retrieve_movies(token):
 @requires_auth('post:movies')
 def create_movie(token):
     schema = MovieSchema()
-    data = load_data(schema, partial=True)
+    data = load_data(schema)
 
     actor_ids = data['actor_ids']
     actors = Actor.query.\

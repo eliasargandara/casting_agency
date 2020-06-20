@@ -3,7 +3,6 @@ from marshmallow import (
     fields,
     validate,
     validates,
-    EXCLUDE,
     ValidationError
 )
 from sqlalchemy.orm import load_only
@@ -78,7 +77,6 @@ class ActorSchema(Schema):
     }
 
     class Meta:
-        unkown = EXCLUDE
         ordered = True
 
 
@@ -132,5 +130,4 @@ class MovieSchema(Schema):
     }
 
     class Meta:
-        unknown = EXCLUDE
         ordered = True
