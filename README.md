@@ -171,8 +171,12 @@ The web API will be available at the url in the output. In this case at
 
 #### Running Integration Tests
 The integration tests are located in `tests` directory and
-it is split into separate files for each resource endpoint.
+are split into separate files for each resource endpoint.
 The tests expect the database name to be `casting_test`.
+The tests also expect authentication bearer tokens to be
+provided for Assistant, Director, and Executive roles using
+the `ASSISTANT_TOKEN`, `DIRECTOR_TOKEN`, and `EXECUTIVE_TOKEN`
+environment variables, respectively.
 
 Run the tests with the command:
 ```
